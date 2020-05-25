@@ -16,8 +16,6 @@ engine = create_engine(conn_string, echo=False)
 Base = declarative_base()
 
 # Define a class that provides the OR/M - mapping
-
-
 class Weather(Base):
     ''' the weather class '''
     __tablename__ = 'weather'
