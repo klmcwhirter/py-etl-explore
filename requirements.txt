@@ -1,4 +1,9 @@
+pip
 pandas
 jupyter
 pylint
+pytest
 sqlalchemy
+bonobo
+docopt
+progressbar2
