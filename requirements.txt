@@ -1,9 +1,11 @@
 pip
+autopep8
 pandas
 jupyter
 pylint
 pytest
 sqlalchemy
 bonobo
+#bonobo-jupyter
 docopt
 progressbar2

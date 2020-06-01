@@ -4,12 +4,15 @@ Usage:
     pandas_etl.py load [--conn=<conn-string>] [-v | --verbose]
 
 Options:
-  --conn=<conn-string>  The connection string to use. [default: sqlite:///:memory:]
+  --conn=<conn-string>  The connection string to use. e.g., sqlite:///pandas_etl.db [default: sqlite:///:memory:]
   -v, --verbose         More verbose output [defaut: false]
   -h --help             Show this screen.
   --version             Show version.
 
 """
+
+import logging
+
 from docopt import docopt
 
 from sqlalchemy import create_engine
@@ -50,25 +53,18 @@ class Weather(Base):
 def main(arguments):
     """The main program"""
 
-    conn_string = arguments['--conn']
-    print(f'setting conn_string to "{conn_string}""')
-
     verbose = arguments['--verbose'] if arguments['--verbose'] else False
 
+    llevel = logging.DEBUG if verbose else logging.INFO
+    logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', level=llevel)
+
+    logging.basicConfig(format='', level=logging.INFO)
+
     if(verbose):
-        print(arguments)
+        logging.debug(arguments)
 
-    # Create the engine --> echo=True utiizes the integration with Python logging to display SQL
-    # To make the output more brief set ```echo=False```.
-
-    engine = create_engine(conn_string, echo=verbose)
-
-    # We do not want to do this in production - it creates the tables ...
-    Base.metadata.create_all(engine)
-
-    # Make a session
-    Session = sessionmaker(bind=engine)
-    session = Session()
+    conn_string = arguments['--conn']
+    logging.info(f'setting conn_string to "{conn_string}""')
 
     # Populate from file
     df_with_reserved = pd.read_table('KPHX_with_reserved.dat', sep='|', header=0,
@@ -87,6 +83,18 @@ def main(arguments):
                                      infer_datetime_format=True,
                                      date_parser=pd.to_datetime
                                      )
+
+    # Create the engine --> echo=True utiizes the integration with Python logging to display SQL
+    # To make the output more brief set ```echo=False```.
+
+    engine = create_engine(conn_string, echo=verbose)
+
+    # We do not want to do this in production - it creates the tables ...
+    Base.metadata.create_all(engine)
+
+    # Make a session
+    Session = sessionmaker(bind=engine)
+    session = Session()
 
     for index, row in df_with_reserved.iterrows():
         w = Weather(**row)

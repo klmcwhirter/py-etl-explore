@@ -1,0 +1,56 @@
+{
+    "gender": "male",
+    "name": {
+        "title": "Mr",
+        "first": "Jetze",
+        "last": "Van Otterlo"
+    },
+    "location": {
+        "street": {
+            "number": 2290,
+            "name": "Harke Sipkesstraat"
+        },
+        "city": "Berkelland",
+        "state": "Zuid-Holland",
+        "country": "Netherlands",
+        "postcode": 41470,
+        "coordinates": {
+            "latitude": "41.4658",
+            "longitude": "-105.0650"
+        },
+        "timezone": {
+            "offset": "0:00",
+            "description": "Western Europe Time, London, Lisbon, Casablanca"
+        }
+    },
+    "email": "jetze.vanotterlo@example.com",
+    "login": {
+        "uuid": "7d73a1f5-d89d-4c14-bb9e-45763f72ca22",
+        "username": "purplewolf374",
+        "password": "quant4307s",
+        "salt": "YGL2XfpS",
+        "md5": "0f631f8fea30421b31e0a183dfe74f1f",
+        "sha1": "c4166663c1caec32f3ed912e40efdf58331e06f4",
+        "sha256": "51f9a768812ad1c16c64e1c6ff08f1190a5e0c0c4749feff61653c26b3e4a82a"
+    },
+    "dob": {
+        "date": "1962-12-20T21:26:52.824Z",
+        "age": 58
+    },
+    "registered": {
+        "date": "2010-11-19T16:29:09.864Z",
+        "age": 10
+    },
+    "phone": "(194)-186-1128",
+    "cell": "(248)-716-4552",
+    "id": {
+        "name": "BSN",
+        "value": "78194620"
+    },
+    "picture": {
+        "large": "https://randomuser.me/api/portraits/men/42.jpg",
+        "medium": "https://randomuser.me/api/portraits/med/men/42.jpg",
+        "thumbnail": "https://randomuser.me/api/portraits/thumb/men/42.jpg"
+    },
+    "nat": "NL"
+}
