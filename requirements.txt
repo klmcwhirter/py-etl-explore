@@ -4,6 +4,7 @@ pandas
 jupyter
 pylint
 pytest
+rope
 sqlalchemy
 bonobo
 #bonobo-jupyter
