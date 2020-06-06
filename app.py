@@ -1,7 +1,7 @@
 """a simple ETL modulle
 
 Usage:
-    bonobo_etl.py load [--conn=<conn-string>] [--file=<file>] [-v | --verbose]
+    app.py load [--conn=<conn-string>] [--file=<file>] [-v | --verbose]
 
 Options:
   --conn=<conn-string>  The connection string to use. e.g., sqlite:///data/outbound/pandas_etl.db [default: sqlite:///:memory:]
