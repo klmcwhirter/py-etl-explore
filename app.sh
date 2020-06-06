@@ -1,1 +1,1 @@
-python app.py load --verbose
+python app.py load
