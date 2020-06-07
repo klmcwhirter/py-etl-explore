@@ -8,7 +8,11 @@ spec:
       containers:
       - name: py-etl-explore
         image: 172.30.1.1:5000/myproject/py-etl-explore
-        command: ["python"]
-        args: ["-m", "bonobo_etl", "load", "--verbose"]
-      restartPolicy: Never
+        args:
+        - python
+        - -m
+        - bonobo_etl
+        - load
+        - "--verbose"
+      restartPolicy: OnFailure
   backoffLimit: 2

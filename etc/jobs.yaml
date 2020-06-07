@@ -1,21 +1,6 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: bonobo-etl
-spec:
-  template:
-    spec:
-      containers:
-      - name: py-etl-explore
-        image: 172.30.1.1:5000/myproject/py-etl-explore
-        command: ["python"]
-        args: ["-m", "bonobo_etl", "load", "--verbose"]
-      restartPolicy: Never
-  backoffLimit: 2
----
-apiVersion: batch/v1
-kind: Job
-metadata:
   name: api-as-source
 spec:
   template:
@@ -23,9 +8,30 @@ spec:
       containers:
       - name: api-as-source
         image: 172.30.1.1:5000/myproject/py-etl-explore
-        command: ["python"]
-        args: ["-m", "api_as_source"]
-      restartPolicy: Never
+        args:
+        - python
+        - -m
+        - api_as_source
+      restartPolicy: OnFailure
+  backoffLimit: 2
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: bonobo-etl
+spec:
+  template:
+    spec:
+      containers:
+      - name: py-etl-explore
+        image: 172.30.1.1:5000/myproject/py-etl-explore
+        args:
+        - python
+        - -m
+        - bonobo_etl
+        - load
+        - --verbose
+      restartPolicy: OnFailure
   backoffLimit: 2
 ---
 apiVersion: batch/v1
@@ -38,7 +44,12 @@ spec:
       containers:
       - name: api-as-source
         image: 172.30.1.1:5000/myproject/py-etl-explore
-        command: ["python"]
-        args: ["-m", "pandas_etl", "load", "--verbose"]
-      restartPolicy: Never
+        args:
+        - python
+        - -m
+        - pandas_etl
+        - load
+        - --verbose
+      restartPolicy: OnFailure
   backoffLimit: 2
+---

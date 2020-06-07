@@ -36,8 +36,7 @@ def get_services(**kwargs):
     verbose = kwargs['--verbose'] if kwargs['--verbose'] else False
 
     llevel = logging.DEBUG if verbose else logging.INFO
-    logging.basicConfig(
-        stream=sys.stdout, format='%(asctime)s %(levelname)s %(message)s', level=llevel)
+    logging.basicConfig(stream=sys.stdout, format='%(asctime)s %(levelname)s %(message)s', level=llevel)
 
     logging.debug(kwargs)
 
@@ -61,7 +60,7 @@ def read_recs(filename, fieldnames):
         reader = csv.DictReader(f, dialect='pipe_delim', fieldnames=fieldnames)
         next(reader, None)  # skip header row
         for row in reader:
-            logging.debug(f'read_recs: row={row}')
+            logging.info(f'read_recs: row={row}')
 
             del row[None]  # remove unused fields
 
@@ -69,7 +68,7 @@ def read_recs(filename, fieldnames):
 
             weatherrec.date = datetime.strptime(row['date'], '%Y-%m-%d')
 
-            logging.debug(f'read_recs: weatherrec={weatherrec}')
+            logging.info(f'read_recs: weatherrec={weatherrec}')
 
             yield weatherrec
 
@@ -77,7 +76,7 @@ def read_recs(filename, fieldnames):
 @use('session')
 def write_recs(rec, session):
     """ write recs as provided """
-    logging.debug(f'write_recs: rec={rec}')
+    logging.info(f'write_recs: rec={rec}')
 
     session.add(rec)
 
