@@ -13,15 +13,15 @@ Options:
 """
 
 import logging
+import sys
 
+import pandas as pd
 from docopt import docopt
-
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-import pandas as pd
-
 from models.weather import Base, Weather
+
 
 def main(args):
     """The main program"""
@@ -29,15 +29,13 @@ def main(args):
     verbose = args['--verbose'] if args['--verbose'] else False
 
     llevel = logging.DEBUG if verbose else logging.INFO
-    logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', level=llevel)
-
-    logging.basicConfig(format='', level=logging.INFO)
+    logging.basicConfig(stream=sys.stdout, format='%(asctime)s %(levelname)s %(message)s', level=llevel)
 
     if verbose:
         logging.debug(args)
 
     conn_string = args['--conn']
-    logging.info(f'setting conn_string to "{conn_string}""')
+    logging.debug(f'setting conn_string to "{conn_string}""')
 
     # Populate from file
     df_with_reserved = pd.read_table(args['--file'], sep='|', header=0,
