@@ -1,12 +1,15 @@
-import bonobo
-from bonobo.config import use
 import pprint
+from time import sleep
+
+import bonobo
 import requests
+from bonobo.config import use
+
 
 def get_services():
     return {
         'randomusers_baseurl': 'https://randomuser.me/api/',
-        'num_results': 5000,
+        'num_results': 5,
         'pprinter': pprint.PrettyPrinter()
     }
 
@@ -33,3 +36,5 @@ graph = bonobo.Graph(
 )
 
 bonobo.run(graph, services=get_services())
+
+sleep(5) # give output time to get into the logs

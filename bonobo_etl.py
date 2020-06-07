@@ -14,6 +14,7 @@ Options:
 
 import csv
 from datetime import datetime
+from time import sleep
 
 import bonobo
 from bonobo.config import use
@@ -111,6 +112,8 @@ def main(args):
     bonobo.run(graph, services=services)
 
     session.commit()
+
+    sleep(5) # give output time to get into the logs
 
 
 if __name__ == '__main__':
