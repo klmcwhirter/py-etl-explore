@@ -13,6 +13,8 @@ Options:
 """
 
 import csv
+import logging
+import sys
 from datetime import datetime
 from time import sleep
 
@@ -33,8 +35,11 @@ def get_services(**kwargs):
 
     verbose = kwargs['--verbose'] if kwargs['--verbose'] else False
 
-    if verbose:
-        print(kwargs)
+    llevel = logging.DEBUG if verbose else logging.INFO
+    logging.basicConfig(
+        stream=sys.stdout, format='%(asctime)s %(levelname)s %(message)s', level=llevel)
+
+    logging.debug(kwargs)
 
     return {
         **kwargs,
@@ -50,15 +55,13 @@ def get_services(**kwargs):
 
 @use('filename')
 @use('fieldnames')
-@use('verbose')
-def read_recs(filename, fieldnames, verbose):
+def read_recs(filename, fieldnames):
     """ read recs using streaming protocol """
     with open(filename, newline='') as f:
         reader = csv.DictReader(f, dialect='pipe_delim', fieldnames=fieldnames)
         next(reader, None)  # skip header row
         for row in reader:
-            if verbose:
-                print(f'read_recs: row={row}')
+            logging.debug(f'read_recs: row={row}')
 
             del row[None]  # remove unused fields
 
@@ -66,18 +69,15 @@ def read_recs(filename, fieldnames, verbose):
 
             weatherrec.date = datetime.strptime(row['date'], '%Y-%m-%d')
 
-            if verbose:
-                print(f'read_recs: weatherrec={weatherrec}')
+            logging.debug(f'read_recs: weatherrec={weatherrec}')
 
             yield weatherrec
 
 
 @use('session')
-@use('verbose')
-def write_recs(rec, session, verbose):
+def write_recs(rec, session):
     """ write recs as provided """
-    if verbose:
-        print(f'write_recs: rec={rec}')
+    logging.debug(f'write_recs: rec={rec}')
 
     session.add(rec)
 
@@ -112,8 +112,6 @@ def main(args):
     bonobo.run(graph, services=services)
 
     session.commit()
-
-    sleep(5) # give output time to get into the logs
 
 
 if __name__ == '__main__':

@@ -1,9 +1,15 @@
+import logging
 import pprint
+import sys
 from time import sleep
 
 import bonobo
 import requests
 from bonobo.config import use
+
+logging.basicConfig(stream=sys.stdout,
+                    format='%(asctime)s %(levelname)s %(message)s',
+                    level=logging.DEBUG)
 
 
 def get_services():
@@ -13,11 +19,12 @@ def get_services():
         'pprinter': pprint.PrettyPrinter()
     }
 
+
 @use('randomusers_baseurl')
 @use('num_results')
 def get_n_users(randomusers_baseurl, num_results):
     url = f'{randomusers_baseurl}?results={num_results}'
-    print(f'url={url}')
+    logging.info(f'url={url}')
     response = requests.get(url)
     if response.ok:
         data = response.json()
@@ -25,10 +32,12 @@ def get_n_users(randomusers_baseurl, num_results):
             for rec in data['results']:
                 yield rec
 
+
 @use('pprinter')
 def pprint_rec(rec, pprinter):
     s = pprinter.pformat(rec)
-    print(f'{s}\n#*------------------------------------------------------------*')
+    logging.info(f'{s}\n#*------------------------------------------------------------*')
+
 
 graph = bonobo.Graph(
     get_n_users,
@@ -36,5 +45,3 @@ graph = bonobo.Graph(
 )
 
 bonobo.run(graph, services=get_services())
-
-sleep(5) # give output time to get into the logs
