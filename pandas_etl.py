@@ -5,7 +5,7 @@ Usage:
 
 Options:
   --conn=<conn-string>  The connection string to use. e.g., sqlite:///pandas_etl.db [default: sqlite:///:memory:]
-  --file=<file>         The file to process [default: KPHX_with_reserved.dat]
+  --file=<file>         The file to process [default: data/inbound/KPHX_with_reserved.dat]
   -v, --verbose         More verbose output [defaut: false]
   -h --help             Show this screen.
   --version             Show version.
@@ -71,7 +71,7 @@ def main(args):
     for _, row in df_with_reserved.iterrows():
         weather = Weather(**row)
         if verbose:
-            print(weather)
+            logging.debug(weather)
         session.add(weather)
 
     session.commit()
