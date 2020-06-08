@@ -16,7 +16,6 @@ import csv
 import logging
 import sys
 from datetime import datetime
-from time import sleep
 
 import bonobo
 from bonobo.config import use
@@ -29,90 +28,97 @@ from models.weather import Weather
 # TODO move this line somewhere central ...
 csv.register_dialect('pipe_delim', delimiter='|')
 
+class BonoboEtlCommand(object):
+    """ Command for Bonobo ETL """
 
-def get_services(**kwargs):
-    """ provide services that can be injected """
+    def __init__(self):
+        """ initialize command """
 
-    verbose = kwargs['--verbose'] if kwargs['--verbose'] else False
-
-    llevel = logging.DEBUG if verbose else logging.INFO
-    logging.basicConfig(stream=sys.stdout, format='%(asctime)s %(levelname)s %(message)s', level=llevel)
-
-    logging.debug(kwargs)
-
-    return {
-        **kwargs,
-        'verbose': verbose,
-        'filename': kwargs['--file'],
-        'fieldnames': ['id', 'city', 'date',
-                       'actual_mean_temp', 'actual_min_temp', 'actual_max_temp',
-                       'actual_precipitation', 'average_precipitation',
-                       'record_precipitation', 'reserved2'],
-        'sqlalchemy.engine': create_engine(kwargs['--conn'], echo=verbose),
-    }
+        self.graph = bonobo.Graph(
+            self.read_recs,
+            self.write_recs
+        )
 
 
-@use('filename')
-@use('fieldnames')
-def read_recs(filename, fieldnames):
-    """ read recs using streaming protocol """
-    with open(filename, newline='') as f:
-        reader = csv.DictReader(f, dialect='pipe_delim', fieldnames=fieldnames)
-        next(reader, None)  # skip header row
-        for row in reader:
-            logging.info(f'read_recs: row={row}')
+    def get_services(self, *args):
+        """ provide services that can be injected """
 
-            del row[None]  # remove unused fields
+        verbose = args[0]['--verbose'] if args[0]['--verbose'] else False
 
-            weatherrec = Weather(**row)  # use kwargs expansion of the dict
+        llevel = logging.DEBUG if verbose else logging.INFO
+        logging.basicConfig(stream=sys.stdout, format='%(asctime)s %(levelname)s %(message)s', level=llevel)
 
-            weatherrec.date = datetime.strptime(row['date'], '%Y-%m-%d')
+        logging.debug(args)
 
-            logging.info(f'read_recs: weatherrec={weatherrec}')
-
-            yield weatherrec
-
-
-@use('session')
-def write_recs(rec, session):
-    """ write recs as provided """
-    logging.info(f'write_recs: rec={rec}')
-
-    session.add(rec)
+        return {
+            **args[0],
+            'verbose': verbose,
+            'filename': args[0]['--file'],
+            'fieldnames': ['id', 'city', 'date',
+                        'actual_mean_temp', 'actual_min_temp', 'actual_max_temp',
+                        'actual_precipitation', 'average_precipitation',
+                        'record_precipitation', 'reserved2'],
+            'sqlalchemy.engine': create_engine(args[0]['--conn'], echo=verbose),
+        }
 
 
-def main(args):
-    """ main program """
+    @use('filename')
+    @use('fieldnames')
+    def read_recs(self, filename, fieldnames):
+        """ read recs using streaming protocol """
+        with open(filename, newline='') as f:
+            reader = csv.DictReader(f, dialect='pipe_delim', fieldnames=fieldnames)
+            next(reader, None)  # skip header row
+            for row in reader:
+                logging.info(f'read_recs: row={row}')
 
-    graph = bonobo.Graph(
-        read_recs,
-        write_recs
-    )
+                del row[None]  # remove unused fields
 
-    # This is not that useful, but does show how to create more complicated graphs
-    # graph.add_chain(
-    #     bonobo.PrettyPrinter(),
-    #     _input=read_recs
-    # )
+                weatherrec = Weather(**row)  # use kwargs expansion of the dict
 
-    services = get_services(**args)
+                weatherrec.date = datetime.strptime(row['date'], '%Y-%m-%d')
 
-    engine = services['sqlalchemy.engine']
+                logging.info(f'read_recs: weatherrec={weatherrec}')
 
-    # We do not want to do this in production - it creates the tables ...
-    Weather.metadata.create_all(engine)
+                yield weatherrec
 
-    # Make a session
-    session = sessionmaker(bind=engine)()
 
-    # Add it to injectable services
-    services['session'] = session
+    @use('session')
+    def write_recs(self, rec, session):
+        """ write recs as provided """
+        logging.info(f'write_recs: rec={rec}')
 
-    bonobo.run(graph, services=services)
+        session.add(rec)
 
-    session.commit()
+
+    def __call__(self, *args, **kwargs):
+        """ execute command """
+
+        # This is not that useful, but does show how to create more complicated graphs
+        # graph.add_chain(
+        #     bonobo.PrettyPrinter(),
+        #     _input=read_recs
+        # )
+
+        services = self.get_services(args[0])
+
+        engine = services['sqlalchemy.engine']
+
+        # We do not want to do this in production - it creates the tables ...
+        Weather.metadata.create_all(engine)
+
+        # Make a session
+        session = sessionmaker(bind=engine)()
+
+        # Add it to injectable services
+        services['session'] = session
+
+        bonobo.run(self.graph, services=services)
+
+        session.commit()
 
 
 if __name__ == '__main__':
+    inst = BonoboEtlCommand()
     arguments = docopt(__doc__, version='1.0')
-    main(arguments)
+    inst(arguments)

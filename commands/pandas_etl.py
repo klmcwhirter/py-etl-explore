@@ -23,58 +23,67 @@ from sqlalchemy.orm import sessionmaker
 from models.weather import Base, Weather
 
 
-def main(args):
-    """The main program"""
+class PandasEtlCommand(object):
+    """ Command for Pandas ETL """
 
-    verbose = args['--verbose'] if args['--verbose'] else False
+    def __init__(self):
+        """ initialize command """
+        pass
 
-    llevel = logging.DEBUG if verbose else logging.INFO
-    logging.basicConfig(stream=sys.stdout, format='%(asctime)s %(levelname)s %(message)s', level=llevel)
+    def __call__(self, *args, **kwargs):
+        """The main program"""
 
-    if verbose:
-        logging.debug(args)
+        verbose = args[0]['--verbose'] if args[0]['--verbose'] else False
 
-    conn_string = args['--conn']
-    logging.debug(f'setting conn_string to "{conn_string}""')
+        llevel = logging.DEBUG if verbose else logging.INFO
+        logging.basicConfig(
+            stream=sys.stdout, format='%(asctime)s %(levelname)s %(message)s', level=llevel)
 
-    # Populate from file
-    df_with_reserved = pd.read_table(args['--file'], sep='|', header=0,
-                                     usecols=[
-                                         'id', 'city', 'date', 'actual_mean_temp', 'actual_min_temp', 'actual_max_temp', 'actual_precipitation', 'average_precipitation', 'record_precipitation', 'reserved2'
-                                     ],
-                                     dtype={
-                                         'id': 'int', 'city': 'string',
-                                         # 'date': '?', # let parser handle the converion - see https://stackoverflow.com/questions/21269399/datetime-dtypes-in-pandas-read-csv
-                                         'actual_mean_temp': 'int8', 'actual_min_temp': 'int8', 'actual_max_temp': 'int8',
-                                         # 'actual_precipitation','average_precipitation','record_precipitation',
-                                         'reserved2': 'string'
-                                     },
-                                     # These next three are needed to parse and optimize datetime input handling
-                                     parse_dates=[2],
-                                     infer_datetime_format=True,
-                                     date_parser=pd.to_datetime
-                                     )
-
-    # Create the engine --> echo=True utiizes the integration with Python logging to display SQL
-    # To make the output more brief set ```echo=False```.
-
-    engine = create_engine(conn_string, echo=verbose)
-
-    # We do not want to do this in production - it creates the tables ...
-    Base.metadata.create_all(engine)
-
-    # Make a session
-    session = sessionmaker(bind=engine)()
-
-    for _, row in df_with_reserved.iterrows():
-        weather = Weather(**row)
         if verbose:
-            logging.debug(weather)
-        session.add(weather)
+            logging.debug(args)
 
-    session.commit()
+        conn_string = args[0]['--conn']
+        logging.debug(f'setting conn_string to "{conn_string}""')
+
+        # Populate from file
+        df_with_reserved = pd.read_table(args[0]['--file'], sep='|', header=0,
+                                        usecols=[
+                                            'id', 'city', 'date', 'actual_mean_temp', 'actual_min_temp', 'actual_max_temp', 'actual_precipitation', 'average_precipitation', 'record_precipitation', 'reserved2'
+        ],
+            dtype={
+                                            'id': 'int', 'city': 'string',
+                                            # 'date': '?', # let parser handle the converion - see https://stackoverflow.com/questions/21269399/datetime-dtypes-in-pandas-read-csv
+                                            'actual_mean_temp': 'int8', 'actual_min_temp': 'int8', 'actual_max_temp': 'int8',
+                                            # 'actual_precipitation','average_precipitation','record_precipitation',
+                                            'reserved2': 'string'
+        },
+            # These next three are needed to parse and optimize datetime input handling
+            parse_dates=[2],
+            infer_datetime_format=True,
+            date_parser=pd.to_datetime
+        )
+
+        # Create the engine --> echo=True utiizes the integration with Python logging to display SQL
+        # To make the output more brief set ```echo=False```.
+
+        engine = create_engine(conn_string, echo=verbose)
+
+        # We do not want to do this in production - it creates the tables ...
+        Base.metadata.create_all(engine)
+
+        # Make a session
+        session = sessionmaker(bind=engine)()
+
+        for _, row in df_with_reserved.iterrows():
+            weather = Weather(**row)
+            if verbose:
+                logging.debug(weather)
+            session.add(weather)
+
+        session.commit()
 
 
 if __name__ == '__main__':
+    inst = PandasEtlCommand()
     arguments = docopt(__doc__, version="1.0")
-    main(arguments)
+    inst(arguments)

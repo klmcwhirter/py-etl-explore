@@ -10,7 +10,8 @@ spec:
         image: 172.30.1.1:5000/myproject/py-etl-explore
         args:
         - python
-        - commands/api_as_source.py
+        - -m
+        - api_as_source
       restartPolicy: OnFailure
   backoffLimit: 2
 ---
@@ -26,7 +27,8 @@ spec:
         image: 172.30.1.1:5000/myproject/py-etl-explore
         args:
         - python
-        - commands/bonobo_etl.py
+        - -m
+        - bonobo_etl
         - load
         - --verbose
       restartPolicy: OnFailure
@@ -44,7 +46,8 @@ spec:
         image: 172.30.1.1:5000/myproject/py-etl-explore
         args:
         - python
-        - commands/pandas_etl.py
+        - -m
+        - pandas_etl
         - load
         - --verbose
       restartPolicy: OnFailure
