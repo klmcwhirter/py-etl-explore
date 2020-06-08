@@ -10,8 +10,7 @@ spec:
         image: 172.30.1.1:5000/myproject/py-etl-explore
         args:
         - python
-        - -m
-        - bonobo_etl
+        - commands/bonobo_etl.py
         - load
         - "--verbose"
       restartPolicy: OnFailure
