@@ -11,7 +11,7 @@ spec:
         args:
         - python
         - -m
-        - api_as_source
+        - commands.api_as_source
       restartPolicy: OnFailure
   backoffLimit: 2
 ---
@@ -28,7 +28,7 @@ spec:
         args:
         - python
         - -m
-        - bonobo_etl
+        - commands.bonobo_etl
         - load
         - --verbose
       restartPolicy: OnFailure
@@ -47,7 +47,7 @@ spec:
         args:
         - python
         - -m
-        - pandas_etl
+        - commands.pandas_etl
         - load
         - --verbose
       restartPolicy: OnFailure
