@@ -1,5 +1,5 @@
+bonobo
+flask
+docopt
 pandas
 sqlalchemy
-bonobo
-docopt
-progressbar2
