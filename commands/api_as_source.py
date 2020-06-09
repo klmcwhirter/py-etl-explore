@@ -8,10 +8,6 @@ import bonobo
 import requests
 from bonobo.config import use
 
-logging.basicConfig(stream=sys.stdout,
-                    format='%(asctime)s %(levelname)s %(message)s',
-                    level=logging.DEBUG)
-
 
 class ApiAsSourceCommand(object):
     """ Command for api_as_source """
@@ -27,7 +23,7 @@ class ApiAsSourceCommand(object):
     def __call__(self, *args, **kwargs):
         """ perform the command """
 
-        logging.info('Running %s', __name__)
+        logging.info('ApiAsSourceCommand: Running %s', __name__)
 
         bonobo.run(self.graph, services=self.get_services())
 
@@ -46,7 +42,7 @@ class ApiAsSourceCommand(object):
         """ get N number random users """
 
         url = f'{randomusers_baseurl}?results={num_results}'
-        logging.info('url=%s', url)
+        logging.info('get_n_users: url=%s', url)
         response = requests.get(url)
         if response.ok:
             data = response.json()
@@ -59,12 +55,17 @@ class ApiAsSourceCommand(object):
         """ pretty print the record """
 
         _s = pprinter.pformat(rec)
-        logging.info('%s\n%s',
+        logging.info('pprint_rec: %s\n%s',
                      _s,
                      '#*------------------------------------------------------------*'
                      )
 
 
 if __name__ == '__main__':
+
+    logging.basicConfig(stream=sys.stdout,
+                        format='%(asctime)s %(levelname)s %(message)s',
+                        level=logging.DEBUG)
+
     inst = ApiAsSourceCommand()
     inst()

@@ -5,6 +5,7 @@ jupyter
 pylint
 pytest
 rope
+setuptools
 sqlalchemy
 bonobo
 docopt

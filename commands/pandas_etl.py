@@ -28,10 +28,11 @@ class PandasEtlCommand(object):
 
     def __init__(self):
         """ initialize command """
-        pass
 
     def __call__(self, *args, **kwargs):
         """The main program"""
+
+        print(f'PandasEtlCommand: {args}')
 
         verbose = args[0]['--verbose'] if args[0]['--verbose'] else False
 
@@ -43,20 +44,22 @@ class PandasEtlCommand(object):
             logging.debug(args)
 
         conn_string = args[0]['--conn']
-        logging.debug(f'setting conn_string to "{conn_string}""')
+        logging.debug(f'setting conn_string to "{conn_string}"')
 
         # Populate from file
-        df_with_reserved = pd.read_table(args[0]['--file'], sep='|', header=0,
-                                        usecols=[
-                                            'id', 'city', 'date', 'actual_mean_temp', 'actual_min_temp', 'actual_max_temp', 'actual_precipitation', 'average_precipitation', 'record_precipitation', 'reserved2'
-        ],
+        df_with_reserved = pd.read_table(
+            args[0]['--file'], sep='|', header=0,
+            usecols=[
+                'id', 'city', 'date', 'actual_mean_temp', 'actual_min_temp', 'actual_max_temp',
+                'actual_precipitation', 'average_precipitation', 'record_precipitation', 'reserved2'
+            ],
             dtype={
-                                            'id': 'int', 'city': 'string',
-                                            # 'date': '?', # let parser handle the converion - see https://stackoverflow.com/questions/21269399/datetime-dtypes-in-pandas-read-csv
-                                            'actual_mean_temp': 'int8', 'actual_min_temp': 'int8', 'actual_max_temp': 'int8',
-                                            # 'actual_precipitation','average_precipitation','record_precipitation',
-                                            'reserved2': 'string'
-        },
+                'id': 'int', 'city': 'string',
+                # 'date': '?', # let parser handle the converion - see https://stackoverflow.com/questions/21269399/datetime-dtypes-in-pandas-read-csv
+                'actual_mean_temp': 'int8', 'actual_min_temp': 'int8', 'actual_max_temp': 'int8',
+                # 'actual_precipitation','average_precipitation','record_precipitation',
+                'reserved2': 'string'
+            },
             # These next three are needed to parse and optimize datetime input handling
             parse_dates=[2],
             infer_datetime_format=True,

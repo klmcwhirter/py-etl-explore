@@ -28,6 +28,7 @@ from models.weather import Weather
 # TODO move this line somewhere central ...
 csv.register_dialect('pipe_delim', delimiter='|')
 
+
 class BonoboEtlCommand(object):
     """ Command for Bonobo ETL """
 
@@ -38,58 +39,6 @@ class BonoboEtlCommand(object):
             self.read_recs,
             self.write_recs
         )
-
-
-    def get_services(self, *args):
-        """ provide services that can be injected """
-
-        verbose = args[0]['--verbose'] if args[0]['--verbose'] else False
-
-        llevel = logging.DEBUG if verbose else logging.INFO
-        logging.basicConfig(stream=sys.stdout, format='%(asctime)s %(levelname)s %(message)s', level=llevel)
-
-        logging.debug(args)
-
-        return {
-            **args[0],
-            'verbose': verbose,
-            'filename': args[0]['--file'],
-            'fieldnames': ['id', 'city', 'date',
-                        'actual_mean_temp', 'actual_min_temp', 'actual_max_temp',
-                        'actual_precipitation', 'average_precipitation',
-                        'record_precipitation', 'reserved2'],
-            'sqlalchemy.engine': create_engine(args[0]['--conn'], echo=verbose),
-        }
-
-
-    @use('filename')
-    @use('fieldnames')
-    def read_recs(self, filename, fieldnames):
-        """ read recs using streaming protocol """
-        with open(filename, newline='') as f:
-            reader = csv.DictReader(f, dialect='pipe_delim', fieldnames=fieldnames)
-            next(reader, None)  # skip header row
-            for row in reader:
-                logging.info(f'read_recs: row={row}')
-
-                del row[None]  # remove unused fields
-
-                weatherrec = Weather(**row)  # use kwargs expansion of the dict
-
-                weatherrec.date = datetime.strptime(row['date'], '%Y-%m-%d')
-
-                logging.info(f'read_recs: weatherrec={weatherrec}')
-
-                yield weatherrec
-
-
-    @use('session')
-    def write_recs(self, rec, session):
-        """ write recs as provided """
-        logging.info(f'write_recs: rec={rec}')
-
-        session.add(rec)
-
 
     def __call__(self, *args, **kwargs):
         """ execute command """
@@ -116,6 +65,56 @@ class BonoboEtlCommand(object):
         bonobo.run(self.graph, services=services)
 
         session.commit()
+
+    def get_services(self, *args):
+        """ provide services that can be injected """
+
+        verbose = args[0]['--verbose'] if args[0]['--verbose'] else False
+
+        llevel = logging.DEBUG if verbose else logging.INFO
+        logging.basicConfig(
+            stream=sys.stdout, format='%(asctime)s %(levelname)s %(message)s', level=llevel)
+
+        logging.debug(args)
+
+        return {
+            **args[0],
+            'verbose': verbose,
+            'filename': args[0]['--file'],
+            'fieldnames': ['id', 'city', 'date',
+                           'actual_mean_temp', 'actual_min_temp', 'actual_max_temp',
+                           'actual_precipitation', 'average_precipitation',
+                           'record_precipitation', 'reserved2'],
+            'sqlalchemy.engine': create_engine(args[0]['--conn'], echo=verbose),
+        }
+
+    @use('filename', 'fieldnames')
+    # @use('fieldnames')
+    def read_recs(self, filename, fieldnames):
+        """ read recs using streaming protocol """
+        with open(filename, newline='') as _f:
+            reader = csv.DictReader(
+                _f, dialect='pipe_delim', fieldnames=fieldnames)
+            next(reader, None)  # skip header row
+            for row in reader:
+                logging.info('read_recs: row=%s', row)
+
+                del row[None]  # remove unused fields
+
+                weatherrec = Weather(**row)  # use kwargs expansion of the dict
+
+                weatherrec.date = datetime.strptime(row['date'], '%Y-%m-%d')
+
+                logging.info('read_recs: weatherrec=%s', weatherrec)
+
+                yield weatherrec
+
+    @use('session')
+    def write_recs(self, rec, session):
+        """ write recs as provided """
+        logging.info('write_recs: rec=%s', rec)
+
+        session.add(rec)
 
 
 if __name__ == '__main__':
