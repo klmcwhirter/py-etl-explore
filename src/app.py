@@ -12,6 +12,14 @@ logging.basicConfig(stream=sys.stdout,
 app = Flask(__name__)
 
 
+@app.route('/')
+def index():
+    return {
+        'status': 'ok',
+        'msg': 'index route'
+    }
+
+
 @app.route('/etl/<command>/<verbose>')
 def do_etl(command, *args, **kwargs):
     """ accept GET request and execute command with the options passed """
