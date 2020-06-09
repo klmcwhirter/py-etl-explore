@@ -2,4 +2,4 @@
 
 cd ${APP_ROOT}/src/src
 
-flask run
+flask run --port=8080
