@@ -1,5 +1,7 @@
-#!/bin/sh
+#!/bin/bash
 
-cd ${APP_ROOT}/src/src
+cd /opt/src/app/src
+
+source ../venv/bin/activate
 
 flask run --port=8080
