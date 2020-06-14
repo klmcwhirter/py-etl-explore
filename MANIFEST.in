@@ -1,0 +1,12 @@
+include *.md
+include *.txt
+include Dockerfile
+include LICENSE
+recursive-include Jupyter *.ipynb
+recursive-include Jupyter *.py
+recursive-include data *.csv
+recursive-include data *.dat
+recursive-include etc *.sh
+recursive-include etc *.yaml
+recursive-include src *.py
+recursive-include src *.sh

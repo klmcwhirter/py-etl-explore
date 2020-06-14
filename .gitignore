@@ -1,3 +1,10 @@
+
+# Created by https://www.toptal.com/developers/gitignore/api/python,visualstudiocode
+# Edit at https://www.toptal.com/developers/gitignore?templates=python,visualstudiocode
+
+# actually gitignore.io - select Python and Visual Studio Code
+
+### Python ###
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -109,7 +116,6 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-jenv/
 
 # Spyder project settings
 .spyderproject
@@ -129,5 +135,19 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# Visual Studio Code
-.vscode
+# pytype static type analyzer
+.pytype/
+
+### VisualStudioCode ###
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+### VisualStudioCode Patch ###
+# Ignore all local history of files
+.history
+
+# End of https://www.toptal.com/developers/gitignore/api/python,visualstudiocode

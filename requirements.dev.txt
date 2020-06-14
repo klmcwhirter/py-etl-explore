@@ -1,11 +1,6 @@
 autopep8
-pandas
 jupyter
 pylint
 pytest
 rope
-setuptools
-bonobo
-docopt
-flask
-sqlalchemy
+twine
