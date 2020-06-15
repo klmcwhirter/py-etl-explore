@@ -1,4 +1,5 @@
 from io import open
+from os.path import exists
 
 import setuptools
 
@@ -7,11 +8,14 @@ with open('requirements.txt', 'r') as f:
     install_reqs = [line.rstrip("\n") for line in lines]
 
 # TODO: enhance this by calling pip freeze instead to pick up version information for development
-with open('requirements.dev.txt', 'r') as f:
-    lines = f.readlines()
-    extras_req_dev = [line.rstrip("\n") for line in lines]
+if exists('requirements.dev.txt'):
+    with open('requirements.dev.txt', 'r') as f:
+        lines = f.readlines()
+        extras_req_dev = [line.rstrip("\n") for line in lines]
+else:
+    extras_req_dev = ''
 
-with open('0. README.md', 'r') as f:
+with open('README.md', 'r') as f:
     long_desc = f.read()
 
 setuptools.setup(
@@ -19,13 +23,13 @@ setuptools.setup(
     description="exploration project of ETL with Python",
     long_description=long_desc,
     long_description_content_type="text/markdown",
-    version="0.0.1",
+    version="0.0.2",
 
     packages=setuptools.find_packages('src'),
     package_dir={'': 'src'},
 
     install_requires=install_reqs,
-    extras_require = {
+    extras_require={
         "dev": extras_req_dev
     },
 

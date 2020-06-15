@@ -2,13 +2,16 @@ FROM python:3
 
 USER 1001
 
-WORKDIR /opt/src/app
+WORKDIR /opt/app-root/src
 
-COPY requirements.txt ./
-
-RUN /bin/bash -c "python3 -m venv venv && source venv/bin/activate && pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt"
-
-COPY data data
+COPY README.md requirements.txt setup.py ./
 COPY src src
 
-CMD [ "/bin/bash", "-c", "./src/app.sh"]
+RUN /bin/bash -c "python3 -m venv venv && source venv/bin/activate \
+    && pip install --no-cache-dir --upgrade pip wheel \
+    && pip install --no-cache-dir -r requirements.txt \
+    && python3 setup.py bdist_wheel"
+
+COPY data data
+
+CMD [ "uwsgi", "app.ini"]

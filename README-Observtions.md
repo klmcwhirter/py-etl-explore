@@ -2,7 +2,7 @@
 
 A place to explore using Python for ETl.
 
-## K8S Jobs :thumbsdown:
+## K8S Jobs :-1:
 The [Job](https://kubernetes.io/docs/concepts/workloads/controllers/jobs-run-to-completion/) concept in Kubernetes (K8S) is ill conceived.
 
 It assumes that a job runs to completion and that is it. A Job cannot be re-run.

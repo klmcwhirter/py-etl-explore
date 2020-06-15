@@ -1,6 +1,7 @@
 wheel
 bonobo
 flask
+uwsgi
 docopt
 pandas
 sqlalchemy

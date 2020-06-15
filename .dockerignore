@@ -1,0 +1,6 @@
+.s2i/
+.vscode/
+dist/
+venv/
+__pycache__/
+Jupyter/
