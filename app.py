@@ -48,5 +48,5 @@ def api_kwargs_to_options(**kwargs):
     return {
         '--verbose': verbose,
         '--conn': 'sqlite:///:memory:',
-        '--file': '../data/inbound/KPHX_with_reserved.dat'
+        '--file': './data/inbound/KPHX_with_reserved.dat'
     }
